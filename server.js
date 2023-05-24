@@ -79,7 +79,6 @@ app.post("/messages", async (req, res) => {
 app.get("/messages", (req, res) => {
     const { senderKey, recieverKey } = req.body;
     const tableName = [senderKey, recieverKey].sort().join('_');
-    console.log(tableName);
   
     db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name=?`, [tableName], (err, row) => {
       if (err) {
