@@ -76,4 +76,32 @@ app.post("/messages", async (req, res) => {
     });
 });
 
+app.get("/messages", (req, res) => {
+    const { senderKey, recieverKey } = req.body;
+    const tableName = [senderKey, recieverKey].sort().join('_');
+    console.log(tableName);
+  
+    db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name=?`, [tableName], (err, row) => {
+      if (err) {
+        console.error(err);
+        res.status(500).json({ error: "Internal server error" });
+        return;
+      }
+  
+      if (!row) {
+        // Table does not exist, return default value
+        res.json({ messages: [] });
+      } else {
+        db.all(`SELECT * FROM ${tableName}`, (err, rows) => {
+          if (err) {
+            console.error(err);
+            res.status(500).json({ error: "Internal server error" });
+            return;
+          }
+          res.json({ messages: rows });
+        });
+      }
+    });
+  });
+
 app.listen(1337, () => console.log("server is running on port 1337"));
